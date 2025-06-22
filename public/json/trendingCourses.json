@@ -1,0 +1,23 @@
+[
+  {
+    "title": "Full Stack Web Development",
+    "description": "Learn HTML, CSS, JavaScript, React, Node.js and more.",
+    "image": "/WebDevelopment.png",
+    "price": "₹499",
+    "tag": "Best Seller"
+  },
+  {
+    "title": "Digital Marketing Mastery",
+    "description": "SEO, Email, Social Media & Google Ads training.",
+    "image": "https://images.unsplash.com/photo-1686061593269-420785fb8fa0?w=600&auto=format&fit=crop&q=60",
+    "price": "₹399",
+    "tag": "Trending"
+  },
+  {
+    "title": "Video Editing Pro",
+    "description": "Master Adobe Premiere Pro, After Effects & more.",
+    "image": "/VideoEditing.png",
+    "price": "₹349",
+    "tag": "Hot"
+  }
+]

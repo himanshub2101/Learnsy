@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Master Digital Marketing",
+    "description": "Learn SEO, social media, Google Ads, and email campaigns from industry experts.",
+    "image": "https://source.unsplash.com/600x400/?digitalmarketing,seo",
+    "cta": "Start Learning"
+  },
+  {
+    "title": "Become a Web Developer",
+    "description": "Build modern websites using HTML, CSS, JavaScript, React, Node.js and more.",
+    "image": "/WebBannerImage.png",
+    "cta": "Explore Courses"
+  },
+  {
+    "title": "Create Stunning Video Content",
+    "description": "Master Premiere Pro, After Effects & DaVinci Resolve to become a pro editor.",
+    "image": "https://source.unsplash.com/600x400/?videoediting,postproduction",
+    "cta": "Start Editing"
+  },
+  {
+    "title": "Launch Your Digital Marketing Career",
+    "description": "Upskill in performance marketing, analytics, and automation strategies.",
+    "image": "https://source.unsplash.com/600x400/?ads,marketing",
+    "cta": "Join the Program"
+  },
+  {
+    "title": "Full Stack Web Development",
+    "description": "End-to-end learning: Frontend, Backend, MongoDB, APIs & Hosting.",
+    "image": "https://source.unsplash.com/600x400/?fullstack,developer",
+    "cta": "Enroll Now"
+  },
+  {
+    "title": "Edit Like a Pro",
+    "description": "Create cinematic edits for YouTube, reels & client projects using Adobe tools.",
+    "image": "https://source.unsplash.com/600x400/?filmmaking,adobe",
+    "cta": "Start Editing"
+  },
+  {
+    "title": "Grow Your Business Online",
+    "description": "Learn content creation, branding, and social media growth tactics.",
+    "image": "https://source.unsplash.com/600x400/?branding,socialmedia",
+    "cta": "Grow Now"
+  }
+]

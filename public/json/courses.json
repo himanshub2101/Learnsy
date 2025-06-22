@@ -1,0 +1,189 @@
+{
+  "categories": [
+    "Web Development",
+    "App Development",
+    "Video & 3D Editing",
+    "Programming",
+    "Digital Marketing"
+  ],
+  "subcategories": [
+    { "name": "HTML", "learners": "50M+", "category": "Web Development" },
+    { "name": "CSS", "learners": "45M+", "category": "Web Development" },
+    { "name": "JavaScript", "learners": "60M+", "category": "Web Development" },
+    { "name": "React.js", "learners": "30M+", "category": "Web Development" },
+    { "name": "Node.js", "learners": "20M+", "category": "Web Development" },
+    { "name": "Angular", "learners": "10M+", "category": "Web Development" },
+    { "name": "React Native", "learners": "15M+", "category": "App Development" },
+    { "name": "Adobe Premiere Pro", "learners": "12M+", "category": "Video & 3D Editing" },
+    { "name": "Blender", "learners": "5M+", "category": "Video & 3D Editing" },
+    { "name": "Python", "learners": "70M+", "category": "Programming" },
+    { "name": "Golang", "learners": "8M+", "category": "Programming" },
+    { "name": "SEO", "learners": "35M+", "category": "Digital Marketing" },
+    { "name": "Google Ads", "learners": "25M+", "category": "Digital Marketing" },
+    { "name": "Meta Ads", "learners": "20M+", "category": "Digital Marketing" },
+    { "name": "Email Marketing", "learners": "15M+", "category": "Digital Marketing" },
+    { "name": "Content Marketing", "learners": "18M+", "category": "Digital Marketing" }
+  ],
+  "courses": [
+    {
+      "title": "HTML for Beginners",
+      "subcategory": "HTML",
+      "instructors": "Code Master",
+      "rating": 4.6,
+      "reviews": 2000,
+      "price": "₹499",
+      "tag": "Top Rated",
+      "image": "/images/html.jpg"
+    },
+    {
+      "title": "CSS Complete Guide",
+      "subcategory": "CSS",
+      "instructors": "UI Ninja",
+      "rating": 4.7,
+      "reviews": 2500,
+      "price": "₹699",
+      "tag": "Bestseller",
+      "image": "/images/css.jpg"
+    },
+    {
+      "title": "JavaScript Essentials",
+      "subcategory": "JavaScript",
+      "instructors": "JS Wizard",
+      "rating": 4.8,
+      "reviews": 3500,
+      "price": "₹899",
+      "tag": "Premium",
+      "image": "/images/javascript.jpg"
+    },
+    {
+      "title": "Mastering React.js from Scratch",
+      "subcategory": "React.js",
+      "instructors": "Himanshu Rao",
+      "rating": 4.8,
+      "reviews": 2600,
+      "price": "₹999",
+      "tag": "Top Rated",
+      "image": "/images/react.jpg"
+    },
+    {
+      "title": "Full Stack Development with Node.js & React",
+      "subcategory": "Node.js",
+      "instructors": "Himanshu Rao",
+      "rating": 4.7,
+      "reviews": 1800,
+      "price": "₹1,299",
+      "tag": "Bestseller",
+      "image": "/images/node-react.jpg"
+    },
+    {
+      "title": "Angular Crash Course",
+      "subcategory": "Angular",
+      "instructors": "Dev Instructor",
+      "rating": 4.5,
+      "reviews": 900,
+      "price": "₹799",
+      "tag": "Premium",
+      "image": "/images/angular.jpg"
+    },
+    {
+      "title": "React Native for Beginners",
+      "subcategory": "React Native",
+      "instructors": "Mobile Pro",
+      "rating": 4.6,
+      "reviews": 1400,
+      "price": "₹1,099",
+      "tag": "Bestseller",
+      "image": "/images/react-native.jpg"
+    },
+    {
+      "title": "Adobe Premiere Pro Essentials",
+      "subcategory": "Adobe Premiere Pro",
+      "instructors": "Editor Guru",
+      "rating": 4.7,
+      "reviews": 2200,
+      "price": "₹899",
+      "tag": "Top Rated",
+      "image": "/images/premiere.jpg"
+    },
+    {
+      "title": "3D Modeling with Blender",
+      "subcategory": "Blender",
+      "instructors": "Creative Studio",
+      "rating": 4.9,
+      "reviews": 3100,
+      "price": "₹1,299",
+      "tag": "Premium",
+      "image": "/images/blender.jpg"
+    },
+    {
+      "title": "Python for Beginners",
+      "subcategory": "Python",
+      "instructors": "Data Mentor",
+      "rating": 4.9,
+      "reviews": 5000,
+      "price": "₹999",
+      "tag": "Bestseller",
+      "image": "/images/python.jpg"
+    },
+    {
+      "title": "Golang Bootcamp",
+      "subcategory": "Golang",
+      "instructors": "Go Expert",
+      "rating": 4.6,
+      "reviews": 800,
+      "price": "₹1,099",
+      "tag": "Premium",
+      "image": "/images/golang.jpg"
+    },
+    {
+      "title": "Search Engine Optimization (SEO) Basics",
+      "subcategory": "SEO",
+      "instructors": "Digital Champ",
+      "rating": 4.7,
+      "reviews": 3000,
+      "price": "₹699",
+      "tag": "Bestseller",
+      "image": "/images/seo.jpg"
+    },
+    {
+      "title": "Google Ads Mastery",
+      "subcategory": "Google Ads",
+      "instructors": "Ad Expert",
+      "rating": 4.6,
+      "reviews": 1900,
+      "price": "₹899",
+      "tag": "Premium",
+      "image": "/images/google-ads.jpg"
+    },
+    {
+      "title": "Meta Ads Deep Dive",
+      "subcategory": "Meta Ads",
+      "instructors": "Social Media Pro",
+      "rating": 4.5,
+      "reviews": 1100,
+      "price": "₹799",
+      "tag": "Top Rated",
+      "image": "/images/meta-ads.jpg"
+    },
+    {
+      "title": "Email Marketing for Growth",
+      "subcategory": "Email Marketing",
+      "instructors": "Campaign Wizard",
+      "rating": 4.8,
+      "reviews": 1600,
+      "price": "₹899",
+      "tag": "Premium",
+      "image": "/images/email-marketing.jpg"
+    },
+    {
+      "title": "Content Marketing Strategy",
+      "subcategory": "Content Marketing",
+      "instructors": "Content King",
+      "rating": 4.9,
+      "reviews": 2500,
+      "price": "₹999",
+      "tag": "Bestseller",
+      "image": "/images/content-marketing.jpg"
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+/* --- Page Container --- */
+.course-page-container {
+  padding: 2rem 1rem;
+  max-width: 1280px;
+  margin: auto;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fafafa;
+}
+
+/* --- Page Header --- */
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  color: #222;
+}
+
+.page-header p {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* --- Category Pills --- */
+.subcategories {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 1rem 0;
+  margin-bottom: 2rem;
+  scrollbar-width: none;
+}
+
+.subcategories::-webkit-scrollbar {
+  display: none;
+}
+
+.pill {
+  padding: 10px 18px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: #f1f1f1;
+  cursor: pointer;
+  font-size: 14px;
+  color: #444;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+.pill:hover {
+  background-color: #ececec;
+  color: #6c63ff;
+  border-color: #6c63ff;
+}
+
+.pill.active {
+  background-color: #6c63ff;
+  color: white;
+  border-color: #6c63ff;
+}
+
+/* --- Section Titles --- */
+.course-section h2,
+.trending-section h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* --- Course Cards Grid --- */
+.course-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+  padding-bottom: 2rem;
+}
+
+/* --- Course Card Styles --- */
+.course-card {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.course-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+/* --- Card Content --- */
+.card-content {
+  padding: 16px;
+}
+
+.card-content h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 6px;
+}
+
+.card-content p {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.rating-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+/* --- Tag Styles --- */
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  background-color: #eee;
+  color: #333;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.tag.best-seller {
+  background-color: #fce9e0;
+  color: #c04a00;
+}
+
+.tag.trending {
+  background-color: #e0f7fa;
+  color: #007b83;
+}
+
+.tag.hot {
+  background-color: #ffe0e0;
+  color: #d32f2f;
+}
+
+.tag.premium {
+  background-color: #e6f4ea;
+  color: #007e3c;
+}
+
+.tag.top-rated {
+  background-color: #e6f0fa;
+  color: #1b57c4;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .subcategories {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .course-cards {
+    grid-template-columns: 1fr;
+  }
+}

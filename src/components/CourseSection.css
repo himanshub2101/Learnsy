@@ -1,0 +1,157 @@
+/* --- Subcategory Pills --- */
+.subcategories {
+  display: flex;
+  flex-wrap: nowrap;         /* Keep pills in a single row */
+  overflow-x: auto;          /* Enable horizontal scroll */
+  gap: 12px;
+  padding: 0 1rem;
+  margin-bottom: 24px;
+  scrollbar-width: none;     /* Firefox - hide scrollbar */
+}
+
+.subcategories::-webkit-scrollbar {
+  display: none;             /* Chrome/Safari - hide scrollbar */
+}
+
+.pill {
+  flex: 0 0 auto;            /* Prevent growing or shrinking */
+  padding: 10px 16px;
+  border: 1px solid #d1d1d1;
+  border-radius: 20px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+  min-width: 120px;
+  text-transform: capitalize;
+}
+
+.pill:hover {
+  background-color: #ececec;
+  border-color: #6c63ff;
+  color: #6c63ff;
+}
+
+.pill.active {
+  background-color: #6c63ff;
+  color: #fff;
+  border-color: #6c63ff;
+}
+
+/* --- Course Cards --- */
+.course-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 0 1rem;
+}
+
+.course-card {
+  background-color: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.course-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.course-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 16px;
+}
+
+.card-content h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-content p {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rating-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #222;
+  margin-bottom: 6px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  background-color: #e5f0ff;
+  color: #2d4fff;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* Tag colors based on type */
+.tag.bestseller {
+  background-color: #fce9e0;
+  color: #c04a00;
+}
+.tag.premium {
+  background-color: #e6f4ea;
+  color: #007e3c;
+}
+.tag.top-rated {
+  background-color: #e6f0fa;
+  color: #1b57c4;
+}
+
+/* --- Responsive Tweaks --- */
+@media (max-width: 768px) {
+  .course-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .card-content h4,
+  .card-content p {
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .card-content {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .subcategories {
+    flex-wrap: nowrap;       /* Enforce horizontal scroll */
+    overflow-x: auto;
+  }
+
+  .pill {
+    width: auto;
+    flex-shrink: 0;
+    text-align: center;
+  }
+}

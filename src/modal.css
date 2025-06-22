@@ -1,0 +1,155 @@
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  padding: 20px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Modal Container */
+.modal {
+  background: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  max-width: 720px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Close Button */
+.close-button {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  z-index: 1000;
+}
+.close-button:hover {
+  color: #ff4c4c;
+}
+
+/* Form Styles */
+.enroll-form {
+  text-align: left;
+}
+
+.enroll-form input,
+.enroll-form textarea {
+  width: 100%;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.enroll-form input:invalid:focus,
+.enroll-form textarea:invalid:focus {
+  border-color: red;
+  box-shadow: 0 0 5px red;
+}
+
+.enroll-form button {
+  background-color: #6c63ff;
+  color: white;
+  border: none;
+  padding: 14px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.enroll-form button:hover {
+  background-color: #4b46d4;
+}
+
+/* Success Message */
+.success-message {
+  text-align: center;
+  padding: 30px;
+}
+
+.checkmark {
+  font-size: 3rem;
+  color: green;
+  margin-bottom: 12px;
+}
+
+/* Form Row with 3 Fields */
+.form-row-3 {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.form-row-3 input {
+  flex: 1;
+}
+
+/* Responsive Fixes */
+@media (max-width: 768px) {
+  .modal {
+    padding: 24px 16px;
+  }
+
+  .form-row-3 {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .enroll-form input,
+  .enroll-form textarea {
+    font-size: 0.95rem;
+    padding: 14px 16px;
+  }
+
+  .enroll-form button {
+    font-size: 1rem;
+  }
+
+  .close-button {
+    top: 10px;
+    right: 12px;
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: 20px 12px;
+  }
+
+  .enroll-form input,
+  .enroll-form textarea {
+    font-size: 0.9rem;
+    padding: 12px;
+  }
+
+  .enroll-form button {
+    font-size: 0.95rem;
+    padding: 12px;
+  }
+
+  .checkmark {
+    font-size: 2.5rem;
+  }
+}
