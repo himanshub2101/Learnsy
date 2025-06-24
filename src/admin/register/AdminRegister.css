@@ -1,0 +1,81 @@
+/* AdminRegister.css */
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f3f6fc;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.auth-form {
+  background-color: white;
+  padding: 2rem 2.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
+}
+
+.auth-form h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #2c3e50;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: #2e7eed;
+}
+
+.auth-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #2e7eed;
+  color: white;
+  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.auth-form button:hover {
+  background-color: #1c5dcc;
+}
+
+.auth-error {
+  color: #e74c3c;
+  font-size: 14px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.auth-links {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-links a {
+  color: #2e7eed;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}

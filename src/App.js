@@ -7,15 +7,20 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Preloader from './components/Preloader';
 import ContactPage from './pages/ContactPage';
+import AdminDashboard from './admin/pages/AdminDashboard';
+import AdminLogin from './admin/auth/AdminLogin';
+import AdminRegister from './admin/register/AdminRegister';
+import ProtectedRoute from './ProtectedRoutes/ProtectedRoute';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import AddCourse from './admin/pages/AddCourse';
 
 function AppContent() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
 
-  // Simulate loading on initial render and on route change
   useEffect(() => {
     setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 800); // Adjust time as needed
+    const timer = setTimeout(() => setLoading(false), 800);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
@@ -25,8 +30,28 @@ function AppContent() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/courses" element={<AllCoursesPage />} />
-            <Route path="/contact" element={<ContactPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          
+          </ProtectedRoute>
+        }
+      />
 
+      <Route
+  path="/add-course"
+  element={
+    <ProtectedRoute>
+      <AddCourse />
+    </ProtectedRoute>
+  }
+/>
+
+      <Route path="/admin-login" element={<AdminLogin />} />
+      <Route path="/admin-register" element={<AdminRegister />} />
     </Routes>
   );
 }

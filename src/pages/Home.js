@@ -35,13 +35,19 @@ const Home = () => {
           {
             title: "Master Digital Marketing",
             description: "Learn SEO, social media, email marketing, and grow your business online.",
-            image: "https://source.unsplash.com/600x400/?digitalmarketing",
+            image: "../../public/DigitalMarketingBanner.jpg",
             cta: "Start Learning"
           },
           {
             title: "Become a Web Developer",
             description: "Learn HTML, CSS, JavaScript, and frameworks like React.",
-            image: "../../WebBannerImage.png",
+            image: "../../public/WebDevelopment.png",
+            cta: "Explore Courses"
+          },
+          {
+            title: "Become a Pro Video Editor",
+            description: "Learn Learn Adobe Premier Pro, Blender, Canva, and all.",
+            image: "../../public/VideoEditingBanner.webp",
             cta: "Explore Courses"
           }
         ]);
