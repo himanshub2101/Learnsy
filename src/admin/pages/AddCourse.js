@@ -6,6 +6,8 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../../firebase';
 import Select from 'react-select';
 import Sidebar from '../components/Sidebar';
+import { deleteDoc, doc as firestoreDoc } from 'firebase/firestore';
+import { updateDoc } from 'firebase/firestore';
 import './AddCourse.css';
 
 export default function AddCourse() {
@@ -19,7 +21,8 @@ export default function AddCourse() {
 
   /* ──────────────────── listing & fetch ──────────────────── */
   const [courses, setCourses] = useState([]);
-
+const [showEditModal, setShowEditModal] = useState(false);
+const [courseToEdit, setCourseToEdit] = useState(null);
   /* ──────────────────── category, sub-category, tag state ──────────────────── */
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [subcategoryOptions, setSubcategoryOptions] = useState([]);
@@ -58,6 +61,34 @@ export default function AddCourse() {
     };
     fetchAll();
   }, []);
+
+  const handleEditCourse = async (courseId, updatedData) => {
+  try {
+    const courseRef = firestoreDoc(db, 'courses', courseId);
+    await updateDoc(courseRef, updatedData);
+    setMessage('✅ Course updated successfully!');
+
+    // re-fetch or patch locally
+    setCourses(prev =>
+      prev.map(c => (c.id === courseId ? { ...c, ...updatedData } : c))
+    );
+  } catch (err) {
+    console.error('Update failed:', err);
+    setMessage('❌ Failed to update course.');
+  }
+};
+
+
+  const handleDeleteCourse = async (courseId) => {
+  try {
+    await deleteDoc(firestoreDoc(db, 'courses', courseId));
+    setCourses(prev => prev.filter(c => c.id !== courseId));
+    setMessage('✅ Course deleted successfully!');
+  } catch (err) {
+    console.error('Delete failed:', err);
+    setMessage('❌ Failed to delete course.');
+  }
+};
 
   /* ──────────────────── curriculum handlers ──────────────────── */
   const handleCurriculumChange = (idx, field, val) => {
@@ -363,25 +394,66 @@ const handleAddTags = async () => {
                 <th>Thumbnail</th>
               </tr>
             </thead>
-            <tbody>
-              {courses.map(c => (
-                <tr key={c.id}>
-                  <td>{c.title}</td>
-                  <td>{(c.categories || []).join(', ')}</td>
-                  <td>{(c.subcategories || []).join(', ')}</td>
-                  <td>{(c.tags || []).join(', ')}</td>
-                  <td>
-                    {c.thumbnailURL && (
-                      <img
-                        src={c.thumbnailURL}
-                        alt="thumb"
-                        style={{ width: 60, borderRadius: 6 }}
-                      />
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+<tbody>
+  {courses.map(c => (
+    <tr key={c.id} className="course-row">
+      {/* Title with action icons on hover */}
+      <td>
+        <div className="row-title-wrapper">
+          {c.title}
+          <div className="row-actions">
+<button
+  className="icon-button edit"
+  title="Edit course"
+  onClick={() => {
+    setCourseToEdit(c);
+    setShowEditModal(true);   // modal open
+  }}
+>
+  <i className="fa-solid fa-pen-to-square"></i>
+</button>
+
+
+            <button
+              className="icon-button delete"
+onClick={() => {
+  if (window.confirm('Are you sure you want to delete this course?')) {
+    handleDeleteCourse(c.id);
+  }
+}}
+
+              title="Delete course"
+            >
+              <i className="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </td>
+
+      {/* Categories */}
+      <td>{(c.categories || []).join(', ')}</td>
+
+      {/* Subcategories */}
+      <td>{(c.subcategories || []).join(', ')}</td>
+
+      {/* Tags */}
+      <td>{(c.tags || []).join(', ')}</td>
+
+      {/* Thumbnail */}
+      <td>
+        {c.thumbnailURL && (
+          <img
+            src={c.thumbnailURL}
+            alt="thumb"
+            style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 6 }}
+          />
+        )}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
+
           </table>
         </div>
 

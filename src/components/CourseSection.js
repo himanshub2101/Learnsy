@@ -1,71 +1,88 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  limit,
+  onSnapshot
+} from 'firebase/firestore';
+import { db } from '../firebase';            // ← path verify कर लेना
 import './CourseSection.css';
 import GlobalEnrollModal from '../modal';
 
 const CourseSection = () => {
-  const [data, setData] = useState(null);
-  const [activeCategory, setActiveCategory] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    phone: '',
-    alternatePhone: '',
-    email: '',
-    address: ''
+  /* ───── taxonomy + courses state ───── */
+  const [categories,    setCategories]    = useState([]);   // [{label,value}]
+  const [subcategories, setSubcategories] = useState([]);   // [{label,parent}]
+  const [courses,       setCourses]       = useState([]);
+  const [activeCategory,setActiveCategory]= useState('');
+
+  /* ───── enroll modal state ───── */
+  const [showModal,      setShowModal]      = useState(false);
+  const [formSubmitted,  setFormSubmitted]  = useState(false);
+  const [formData,       setFormData]       = useState({
+    firstName:'', middleName:'', lastName:'',
+    phone:'', alternatePhone:'', email:'', address:'',
+    courseName:''
   });
 
+  /* ───── fetch categories & subcats once ───── */
   useEffect(() => {
-    fetch('/json/courses.json')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch courses');
-        return res.json();
-      })
-      .then((json) => {
-        setData(json);
-        if (json.categories.length > 0) {
-          setActiveCategory(json.categories[0]);
-        }
-      })
-      .catch((err) => {
-        console.error('Error loading data:', err);
-      });
+    (async () => {
+      const catSnap = await getDocs(collection(db,'categories'));
+      const catArr  = catSnap.docs.map(d => d.data());   // {label,value}
+      setCategories(catArr);
+      if (catArr.length) setActiveCategory(catArr[0].value);
+
+      const subSnap = await getDocs(collection(db,'subcategories'));
+      setSubcategories(subSnap.docs.map(d => d.data())); // {label,parent}
+    })();
   }, []);
 
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  /* ───── live listener for top-6 courses in activeCategory ───── */
+  useEffect(() => {
+    if (!activeCategory) return;
+    const q = query(
+      collection(db,'courses'),
+      where('categories','array-contains',activeCategory),
+      limit(6)                                   // सिर्फ 6 दिखा रहे हैं
+    );
+    const unsub = onSnapshot(q,snap=>{
+      setCourses(snap.docs.map(d=>({id:d.id,...d.data()})));
+    });
+    return unsub;
+  }, [activeCategory]);
 
-  const handleSubmit = (e) => {
+  /* ───── derive subcat filter (optional) ───── */
+  const activeSubcats = subcategories
+    .filter(s => (s.parent || s.category) === activeCategory)
+    .map(s => s.label);
+
+  const filteredCourses = activeSubcats.length
+    ? courses.filter(c => {
+        const subArr = Array.isArray(c.subcategories)
+          ? c.subcategories
+          : [c.subcategory || ''];
+        return subArr.some(s => activeSubcats.includes(s));
+      })
+    : courses;
+
+  /* ───── modal submit dummy ───── */
+  const handleSubmit = e => {
     e.preventDefault();
     setFormSubmitted(true);
-    setTimeout(() => {
-      setShowModal(false);
-      setFormSubmitted(false);
-      setFormData({
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        phone: '',
-        alternatePhone: '',
-        email: '',
-        address: ''
-      });
-    }, 2000);
+    setTimeout(()=>{
+      setShowModal(false); setFormSubmitted(false);
+      setFormData(prev=>({...prev,firstName:'',middleName:'',lastName:'',
+        phone:'',alternatePhone:'',email:'',address:'',courseName:''}));
+    },2000);
   };
 
-  if (!data) return <div className="loading-message">Loading courses...</div>;
+  if (!categories.length)
+    return <div className="loading-message">Loading courses…</div>;
 
-  const activeSubcategories = data.subcategories
-    .filter((sub) => sub.category === activeCategory)
-    .map((sub) => sub.name);
-
-  const filteredCourses = data.courses.filter((course) =>
-    activeSubcategories.includes(course.subcategory)
-  );
-
+  /* ───── JSX ───── */
   return (
     <>
       <section className="section-heading-centered">
@@ -75,42 +92,44 @@ const CourseSection = () => {
       </section>
 
       <section className="course-section">
-        {/* Category Pills */}
+        {/* category pills */}
         <div className="subcategories">
-          {data.categories.map((cat, i) => (
+          {categories.map(cat=>(
             <div
-              key={i}
-              className={`pill ${cat === activeCategory ? 'active' : ''}`}
-              onClick={() => setActiveCategory(cat)}
+              key={cat.value}
+              className={`pill ${cat.value===activeCategory?'active':''}`}
+              onClick={()=>setActiveCategory(cat.value)}
             >
-              <strong>{cat}</strong>
+              <strong>{cat.label}</strong>
             </div>
           ))}
         </div>
 
-        {/* Course Cards */}
+        {/* course cards */}
         <div className="course-cards">
-          {filteredCourses.map((course, i) => (
-            <div className="course-card" key={i}>
-              <img src={course.image} alt={course.title} />
+          {filteredCourses.map(course=>(
+            <div className="course-card" key={course.id}>
+              <img src={course.thumbnailURL || '/placeholder.jpg'} alt={course.title}/>
               <div className="card-content">
                 <h4 title={course.title}>{course.title}</h4>
-                <p title={course.instructors}>{course.instructors}</p>
+                {course.instructors && <p title={course.instructors}>{course.instructors}</p>}
+
                 <div className="rating-price">
-                  <span>⭐ {course.rating} ({course.reviews.toLocaleString()})</span>
+                  <span>⭐ {course.rating || 4.5} (
+                    {(course.reviews || 100).toLocaleString()})</span>
                 </div>
+
                 {course.tag && (
-                  <span className={`tag ${course.tag.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <span className={`tag ${course.tag.toLowerCase().replace(/\s+/g,'-')}`}>
                     {course.tag}
                   </span>
                 )}
+
                 <button
                   className="enroll-btn"
-                  onClick={() => setShowModal(true)}
-                  style={{ marginTop: '10px', width: '100%', padding: '10px' }}
-                >
-                  Enroll Now
-                </button>
+                  onClick={()=>{ setFormData(p=>({...p,courseName:course.title})); setShowModal(true); }}
+                  style={{marginTop:'10px',width:'100%',padding:'10px'}}
+                >Enroll Now</button>
               </div>
             </div>
           ))}
@@ -119,9 +138,9 @@ const CourseSection = () => {
 
       <GlobalEnrollModal
         show={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={()=>setShowModal(false)}
         onSubmit={handleSubmit}
-        onChange={handleInputChange}
+        onChange={e=>setFormData({...formData,[e.target.name]:e.target.value})}
         formData={formData}
         formSubmitted={formSubmitted}
       />

@@ -615,3 +615,45 @@ button[type="button"],
 button[type="submit"] {
   font-weight: 600;
 }
+
+/* ---------- Hover row actions ---------- */
+
+.row-title-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+/* hide icons by default */
+.row-actions {
+  display: none;
+  gap: 8px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: #fff;        /* same as table cell */
+  padding-left: 12px;
+}
+
+/* show icons when the row itself is hovered */
+.course-row:hover .row-actions {
+  display: flex;
+}
+
+/* basic icon button reset */
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;         /* icon size */
+  line-height: 1;
+  padding: 0;
+  color: #6b7280;          /* slate-500 */
+  transition: color 0.2s ease;
+}
+
+/* colour on hover */
+.icon-button.edit:hover   { color: #2e7d32; } /* green-700  */
+.icon-button.delete:hover { color: #d32f2f; } /* red-700    */
+

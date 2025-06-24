@@ -1,0 +1,20 @@
+.ecm-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);
+  display:flex;justify-content:center;align-items:center;z-index:999;
+}
+.ecm-box{
+  width:520px;max-width:95%;background:#fff;border-radius:14px;
+  padding:26px 30px;box-shadow:0 12px 34px rgba(0,0,0,.25);
+}
+.ecm-box h2{margin-bottom:14px}
+.ecm-box label{font-weight:600;display:block;margin-top:14px;margin-bottom:4px}
+.ecm-box input,.ecm-box textarea{
+  width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;
+}
+.ecm-actions{display:flex;justify-content:flex-end;gap:.8rem;margin-top:22px}
+.ecm-btn-primary{
+  background:#6d28d9;color:#fff;border:none;padding:8px 18px;border-radius:6px;
+}
+.ecm-btn-outline{
+  background:#fff;border:1px solid #9ca3af;padding:8px 18px;border-radius:6px;
+}
