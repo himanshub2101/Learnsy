@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 
 from app.db.postgres import get_db
 from app.models.course import Course
@@ -11,8 +12,16 @@ router = APIRouter(prefix="/courses", tags=["courses"])
 
 # ────────── PUBLIC ──────────
 @router.get("/", response_model=list[CourseOut])
-async def list_courses(db: AsyncSession = Depends(get_db)):
-    result = await db.scalars(select(Course).where(Course.published == True))
+async def list_courses(
+    search: str = Query(default="", alias="search"),
+    skip: int = 0,
+    limit: int = 10,
+    db: AsyncSession = Depends(get_db)
+):
+    query = select(Course).where(Course.published == True)
+    if search:
+        query = query.where(Course.title.ilike(f"%{search}%"))
+    result = await db.scalars(query.offset(skip).limit(limit))
     return result.all()
 
 @router.get("/{course_id}", response_model=CourseOut)
@@ -49,6 +58,11 @@ async def update_course(
     course = await db.get(Course, course_id)
     if not course:
         raise HTTPException(404, "Course not found")
+
+    if data.slug and data.slug != course.slug:
+        existing = await db.scalar(select(Course).where(Course.slug == data.slug))
+        if existing:
+            raise HTTPException(400, "Slug already exists")
 
     for k, v in data.dict(exclude_unset=True).items():
         setattr(course, k, v)

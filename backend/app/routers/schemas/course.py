@@ -1,29 +1,30 @@
-from pydantic import BaseModel, HttpUrl, Field
-from typing import Dict, List, Any, Optional
+from pydantic import BaseModel, Field
+from typing import Optional
+from datetime import datetime
+
+slug_regex = r"^[a-z0-9]+(-[a-z0-9]+)*$"
 
 class CourseBase(BaseModel):
-    title: str
-    slug: str = Field(..., pattern=r"^[a-z0-9-]+$")   # ← replace regex= with pattern=
-    description_md: str = Field(..., max_length=5000)
-    price_usd: float = 0.0
-    thumbnail_url: Optional[HttpUrl] = None
-    modules: Dict | List[Any] = []
+    title: str                = Field(..., min_length=3, max_length=128)
+    description: Optional[str]
+    price: float              = Field(ge=0)
+    is_published: bool        = False
 
 class CourseCreate(CourseBase):
-    pass
+    slug: Optional[str]       = Field(None, pattern=slug_regex)
 
 class CourseUpdate(BaseModel):
-    title: Optional[str]
-    description_md: Optional[str]
-    price_usd: Optional[float]
-    thumbnail_url: Optional[HttpUrl]
-    modules: Optional[Dict | List[Any]]
-    published: Optional[bool]
+    title: Optional[str]      = Field(None, min_length=3, max_length=128)
+    description: Optional[str]
+    price: Optional[float]    = Field(None, ge=0)
+    is_published: Optional[bool]
+    slug: Optional[str]       = Field(None, pattern=slug_regex)
 
 class CourseOut(CourseBase):
     id: str
-    published: bool
-    created_at: str
+    slug: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

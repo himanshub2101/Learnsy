@@ -1,7 +1,8 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import DateTime, func
 from datetime import datetime
 from .base import Base, new_uuid
+from typing import List
 
 class User(Base):
     __tablename__ = "users"
@@ -15,3 +16,6 @@ class User(Base):
     wallet_address: Mapped[str | None]
     role: Mapped[str] = mapped_column(default="user")
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    # ───── Relationship to Courses ─────
+    courses: Mapped[List["Course"]] = relationship(back_populates="creator")

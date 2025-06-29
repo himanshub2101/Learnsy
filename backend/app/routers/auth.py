@@ -11,22 +11,32 @@ from app.core.security import hash_password, verify_password, create_access_toke
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 # ────────── SIGN‑UP ──────────
-@router.post("/signup", response_model=TokenOut, status_code=status.HTTP_201_CREATED)
+@router.post("/signup", response_model=TokenOut)
 async def signup(payload: SignupIn, db: AsyncSession = Depends(get_db)):
-    # Check duplicate email
-    if await db.scalar(select(User).where(User.email == payload.email)):
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+    # Check if user already exists
+    result = await db.execute(select(User).where(User.email == payload.email))
+    existing_user = result.scalars().first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
 
-    user = User(
+    hashed_password = hash_password(payload.password)
+
+    new_user = User(
         id=str(uuid4()),
+        first_name=payload.first_name,
+        last_name=payload.last_name,
         email=payload.email,
-        password_hash=hash_password(payload.password),
-        role="user",           # or 'admin' if you seed manually
+        phone=payload.phone,
+        password_hash=hashed_password,
+        wallet_address=payload.wallet_address,
+        role="user"
     )
-    db.add(user)
+    db.add(new_user)
     await db.commit()
-    token = create_access_token({"sub": user.id, "role": user.role})
-    return {"access_token": token}
+    await db.refresh(new_user)
+
+    token = create_access_token({"sub": str(new_user.id)})
+    return TokenOut(access_token=token)
 
 # ────────── LOGIN ──────────
 @router.post("/login", response_model=TokenOut)
