@@ -13,6 +13,10 @@ import AdminRegister from './admin/register/AdminRegister';
 import ProtectedRoute from './ProtectedRoutes/ProtectedRoute';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import AddCourse from './admin/pages/AddCourse';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 
 function AppContent() {
   const location = useLocation();
@@ -31,6 +35,10 @@ function AppContent() {
       <Route path="/" element={<Home />} />
       <Route path="/courses" element={<AllCoursesPage />} />
       <Route path="/contact" element={<ContactPage />} />
+      <Route path="/signup"          element={<Signup/>} />
+      <Route path="/login"           element={<Login/>} />
+      <Route path="/forgot-password" element={<ForgotPassword/>} />
+      <Route path="/reset-password"  element={<ResetPassword/>} />
       <Route
         path="/admin"
         element={

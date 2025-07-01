@@ -1,162 +1,196 @@
-import React, { useEffect, useState } from 'react';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../firebase';
-import { useNavigate } from 'react-router-dom';
+// src/pages/AdminDashboard.jsx
+import { useEffect, useState, useCallback } from 'react';
+import { useNavigate }             from 'react-router-dom';
+import api                         from '../../api/axios';      // ← Axios instance
+import Sidebar                     from '../components/Sidebar';
+import DashboardCharts             from '../components/DashboardCharts';
 import './AdminDashboard.css';
-import Sidebar from '../components/Sidebar';
-import DashboardCharts from '../components/DashboardCharts';
 
 const AdminDashboard = () => {
-  const [enrollments, setEnrollments] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  /* ───────── state ───────── */
+  const [enrollments, setEnrollments]   = useState([]);
+  const [searchTerm,  setSearchTerm]    = useState('');
   const [filteredCourse, setFilteredCourse] = useState('All');
-  const [courses, setCourses] = useState([]);
-  const [sortKey, setSortKey] = useState('submittedAt');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [courses, setCourses]           = useState([]);
+  const [sortKey, setSortKey]           = useState('submittedAt');
+  const [sortOrder, setSortOrder]       = useState('desc');
   const [showFullMetrics, setShowFullMetrics] = useState(false);
-const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
-
+  const [sidebarMini, setSidebarMini]   = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Token-based route protection
+  /* ───────── route‑guard & data fetch ───────── */
+  const fetchEnrollments = useCallback(async () => {
+    try {
+      const { data } = await api.get('/enrollments');
+      // 🔄 map snake_case → camelCase for React
+      const mapped = data.map(e => ({
+        id:           e.id,
+        firstName:    e.first_name,
+        lastName:     e.last_name,
+        email:        e.email,
+        phone:        e.phone,
+        courseName:   e.course_name,
+        submittedAt:  e.submitted_at,
+      }));
+      setEnrollments(mapped);
+      setCourses([...new Set(mapped.map(i => i.courseName))]);
+    } catch (err) {
+      if (err.response?.status === 401) {
+        localStorage.removeItem('adminToken');
+        navigate('/admin-login');
+      } else {
+        console.error('Fetching enrollments failed:', err);
+      }
+    }
+  }, [navigate]);
+
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
       navigate('/admin-login');
-    } else {
-      fetchEnrollments();
+      return;
     }
-  }, [navigate]);
+    // attach token once
+    api.defaults.headers.common.Authorization = `Bearer ${token}`;
+    fetchEnrollments();
+  }, [fetchEnrollments, navigate]);
 
-  // ✅ Fetch Enrollments
-  const fetchEnrollments = async () => {
+  /* ───────── handlers ───────── */
+  const handleDelete = async id => {
+    if (!window.confirm('Delete this entry?')) return;
     try {
-      const querySnapshot = await getDocs(collection(db, 'enrollments'));
-      const data = querySnapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data(),
-      }));
-      setEnrollments(data);
-      const uniqueCourses = [...new Set(data.map(item => item.courseName))];
-      setCourses(uniqueCourses);
-    } catch (error) {
-      console.error('Error fetching enrollments:', error);
+      await api.delete(`/enrollments/${id}`);
+      // optimistic update
+      setEnrollments(prev => prev.filter(e => e.id !== id));
+    } catch (err) {
+      alert(err.response?.data?.detail || 'Delete failed');
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this entry?')) {
-      await deleteDoc(doc(db, 'enrollments', id));
-      fetchEnrollments();
-    }
-  };
-
-  const handleSort = (key) => {
-    const newOrder = sortKey === key && sortOrder === 'asc' ? 'desc' : 'asc';
+  const handleSort = key => {
+    const order = sortKey === key && sortOrder === 'asc' ? 'desc' : 'asc';
     setSortKey(key);
-    setSortOrder(newOrder);
+    setSortOrder(order);
   };
-
-  const sortedData = [...enrollments].sort((a, b) => {
-    const valA = a[sortKey]?.toLowerCase?.() || a[sortKey];
-    const valB = b[sortKey]?.toLowerCase?.() || b[sortKey];
-    if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-    if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  const filteredData = sortedData.filter(entry => {
-    const matchesCourse = filteredCourse === 'All' || entry.courseName === filteredCourse;
-    const matchesSearch = `${entry.firstName} ${entry.lastName}`.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCourse && matchesSearch;
-  });
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminEmail');
     navigate('/admin-login');
   };
 
+  /* ───────── derived data ───────── */
+  const sorted = [...enrollments].sort((a, b) => {
+    const aVal = a[sortKey]?.toString().toLowerCase() || '';
+    const bVal = b[sortKey]?.toString().toLowerCase() || '';
+    if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortOrder === 'asc' ?  1 : -1;
+    return 0;
+  });
+
+  const filtered = sorted.filter(e => {
+    const matchesCourse =
+      filteredCourse === 'All' || e.courseName === filteredCourse;
+    const matchesSearch =
+      `${e.firstName} ${e.lastName}`.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCourse && matchesSearch;
+  });
+
+  /* ───────── JSX ───────── */
   return (
-
     <>
-<Sidebar onMinimizeChange={setIsSidebarMinimized} />
-<div className={`admin-container ${isSidebarMinimized ? 'sidebar-mini' : ''}`}>
-      <div className="admin-header">
-        <img src="/assets/logo.png" alt="Learnsy Logo" className="admin-logo" />
-        <div className="admin-header-right">
-          <p className="welcome-msg">
-            Welcome back, Admin! Here's the latest enrollment data.
-          </p>
-          <button onClick={handleLogout} className="logout-button">Logout</button>
+      <Sidebar onMinimizeChange={setSidebarMini} />
+
+      <div className={`admin-container ${sidebarMini ? 'sidebar-mini' : ''}`}>
+        {/* ─── Header ─── */}
+        <div className="admin-header">
+          <img src="/assets/logo.png" alt="Learnsy logo" className="admin-logo" />
+          <div className="admin-header-right">
+            <p className="welcome-msg">
+              Welcome back, Admin! Here&#39;s the latest enrollment data.
+            </p>
+            <button onClick={handleLogout} className="logout-button">
+              Logout
+            </button>
+          </div>
         </div>
-      </div>
 
-      <h1>Admin Dashboard</h1>
-      <h3>Total Enrollments: {filteredData.length}</h3>
+        <h1>Admin Dashboard</h1>
+        <h3>Total Enrollments: {filtered.length}</h3>
 
-      <div className="controls">
-        <input
-          type="text"
-          placeholder="Search by name"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        {/* ─── Filters ─── */}
+        <div className="controls">
+          <input
+            type="text"
+            placeholder="Search by name"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
 
-        <select value={filteredCourse} onChange={(e) => setFilteredCourse(e.target.value)}>
-          <option value="All">All Courses</option>
-          {courses.map((course, i) => (
-            <option key={i} value={course}>{course}</option>
-          ))}
-        </select>
-      </div>
-      <div style={{ marginBottom: '1rem' }}>
-  <button 
-    onClick={() => setShowFullMetrics(prev => !prev)}
-    style={{
-      padding: '8px 16px',
-      backgroundColor: '#6d28d2',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '6px',
-      cursor: 'pointer',
-      boxShadow: '0 0 10px rgba(0,0,0,0.1)'
-    }}
-  >
-    {showFullMetrics ? 'Hide Full Metrics' : 'View Full Metrics'}
-  </button>
-</div>
+          <select
+            value={filteredCourse}
+            onChange={e => setFilteredCourse(e.target.value)}
+          >
+            <option value="All">All Courses</option>
+            {courses.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
 
-<DashboardCharts enrollments={filteredData} />
+        {/* ─── Charts ─── */}
+        <div style={{ marginBottom: '1rem' }}>
+          <button
+            onClick={() => setShowFullMetrics(p => !p)}
+            className="metrics-btn"
+          >
+            {showFullMetrics ? 'Hide Full Metrics' : 'View Full Metrics'}
+          </button>
+        </div>
 
-      <table className="enrollment-table">
-        <thead>
-          <tr>
-            <th onClick={() => handleSort('firstName')}>Name {sortKey === 'firstName' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-            <th onClick={() => handleSort('email')}>Email {sortKey === 'email' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-            <th>Phone</th>
-            <th onClick={() => handleSort('courseName')}>Course {sortKey === 'courseName' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-            <th onClick={() => handleSort('submittedAt')}>Date {sortKey === 'submittedAt' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData.map((entry, i) => (
-            <tr key={i}>
-              <td>{entry.firstName} {entry.lastName}</td>
-              <td>{entry.email}</td>
-              <td>{entry.phone}</td>
-              <td>{entry.courseName}</td>
-              <td>{new Date(entry.submittedAt).toLocaleString()}</td>
-              <td>
-                <button onClick={() => handleDelete(entry.id)} className="delete-button">🗑️</button>
-              </td>
+        <DashboardCharts enrollments={filtered} showAll={showFullMetrics} />
+
+        {/* ─── Table ─── */}
+        <table className="enrollment-table">
+          <thead>
+            <tr>
+              <th onClick={() => handleSort('firstName')}>
+                Name {sortKey === 'firstName' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('email')}>
+                Email {sortKey === 'email' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th>Phone</th>
+              <th onClick={() => handleSort('courseName')}>
+                Course {sortKey === 'courseName' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('submittedAt')}>
+                Date {sortKey === 'submittedAt' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
 
+          <tbody>
+            {filtered.map(e => (
+              <tr key={e.id}>
+                <td>{e.firstName} {e.lastName}</td>
+                <td>{e.email}</td>
+                <td>{e.phone}</td>
+                <td>{e.courseName}</td>
+                <td>{new Date(e.submittedAt).toLocaleString()}</td>
+                <td>
+                  <button
+                    onClick={() => handleDelete(e.id)}
+                    className="delete-button"
+                    title="Delete enrollment"
+                  >🗑️
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 };

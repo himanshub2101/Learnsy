@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase';
 import './AdminLogin.css';
-
+import Footer from '../../components/Footer'
+import Header from '../../components/Header';
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +33,8 @@ const handleLogin = async (e) => {
 
 
   return (
+    <>
+    <Header/>
     <div className="auth-container">
       <form onSubmit={handleLogin} className="auth-form">
         <h2>Admin Login</h2>
@@ -53,6 +56,9 @@ const handleLogin = async (e) => {
         <button type="submit">Login</button>
       </form>
     </div>
+
+    <Footer/>
+    </>
   );
 };
 

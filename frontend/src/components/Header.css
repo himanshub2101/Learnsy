@@ -1,63 +1,162 @@
-.main-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #6c63ff;
-  padding: 1rem 10%;
-  color: white;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+/* ───────── Header base ───────── */
+.main-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#6d28d9;           /* deep purple */
+  padding:1rem 10%;
+  color:#fff;
+  position:sticky;
+  top:0;
+  z-index:1000;
 }
 
-.logo a {
-  font-size: 1.8rem;
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
+/* ───────── Logo badge ───────── */
+.logo{line-height:0;}
+
+.logo img {
+  height: 68px;
+  width: auto;
+  object-fit: contain;
+  background: white;
+  padding: 4px; /* reduced to give logo more space */
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.4);
+  transition: 0.4s ease;
+  position: relative;
+  z-index: 1;
+}
+.logo img:hover {
+  transform: rotate(2deg) scale(1.05);
 }
 
-.nav-links {
-  display: flex;
-  gap: 2rem;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  font-size: 1rem;
-  transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-  color: #ddd;
-}
-
-.menu-toggle {
-  display: none;
-  font-size: 2rem;
-  cursor: pointer;
-  color: white;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .nav-links {
-    display: none;
-    flex-direction: column;
-    background-color: #6c63ff;
-    position: absolute;
-    top: 64px;
-    right: 10%;
-    padding: 1rem;
-    border-radius: 10px;
+@media (max-width: 480px) {
+  .logo img {
+    height: 44px;
+    padding: 3px;
   }
+}
 
-  .nav-links.open {
-    display: flex;
-  }
+/* ===== Neon purple border ===== */
+/* .neon-border{position:relative;}
+.neon-border::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  box-shadow:
+    0 0 8px   #b794f4,
+    0 0 12px  #a56bff,
+    0 0 16px  #9146ff,
+    0 0 20px  #7724ff;
+  animation:neonPulse 2.5s ease-in-out infinite;
+}
+@keyframes neonPulse{
+  0%,100%{opacity:.9;filter:brightness(1);}
+  50%    {opacity:.5;filter:brightness(1.4);}
+} */
 
-  .menu-toggle {
-    display: block;
+/* ===== Golden shine border ===== */
+.golden-border {
+  position: relative;
+}
+.golden-border::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    #f6c46d 0%, #f9e29d 25%, #fffbee 40%,
+    #d8a63c 55%, #f6c46d 80%, #f9e29d 100%
+  );
+  -webkit-mask: radial-gradient(circle at center, transparent 64%, #000 66%);
+  mask: radial-gradient(circle at center, transparent 64%, #000 66%);
+  animation: goldSpin 6s linear infinite;
+  filter: blur(1.5px) brightness(1.15);
+  z-index: 0;
+}
+@keyframes goldSpin {
+  to {
+    --angle: 360deg;
   }
+}
+/* ───────── Navigation links ───────── */
+.nav-links{
+  display:flex;
+  gap:2rem;
+  align-items:center;
+}
+.nav-links a{
+  color:#fff;
+  text-decoration:none;
+  font-size:1rem;
+  transition:color .3s;
+}
+.nav-links a:hover{color:#ddd;}
+
+/* ───────── Authentication buttons ───────── */
+.auth-buttons{display:flex;gap:1rem;}
+.auth-buttons .btn-login,
+.auth-buttons .btn-signup{
+  padding:.5rem 1.2rem;
+  font-size:.9rem;
+  font-weight:600;
+  border-radius:6px;
+  text-decoration:none;
+  transition:all .25s;
+}
+.auth-buttons .btn-login{
+  background:transparent;
+  border:1px solid #fff;
+  color:#fff;
+}
+.auth-buttons .btn-login:hover{
+  background:rgba(255,255,255,.15);
+}
+.auth-buttons .btn-signup{
+  background:#fff;
+  color:#6d28d9;
+  border:1px solid #fff;
+}
+.auth-buttons .btn-signup:hover{
+  background:#ddd;
+  color:#6d28d9;
+}
+
+/* ───────── Hamburger toggle ───────── */
+.menu-toggle{
+  display:none;
+  font-size:2rem;
+  cursor:pointer;
+  color:#fff;
+}
+
+/* ───────── Mobile styles ───────── */
+@media(max-width:768px){
+  .nav-links{
+    display:none;
+    flex-direction:column;
+    background:#6d28d9;
+    position:absolute;
+    top:64px;
+    right:10%;
+    padding:1rem;
+    border-radius:10px;
+    width:max-content;
+    min-width:200px;
+    text-align:right;
+  }
+  .nav-links.open{display:flex;}
+  .auth-buttons{
+    flex-direction:column;
+    gap:.5rem;
+    margin-top:1rem;
+  }
+  .auth-buttons .btn-login,
+  .auth-buttons .btn-signup{
+    width:100%;
+    text-align:center;
+  }
+  .menu-toggle{display:block;}
 }

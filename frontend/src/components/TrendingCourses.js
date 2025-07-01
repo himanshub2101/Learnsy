@@ -1,87 +1,81 @@
+// src/components/TrendingCourses.js
+
 import React, { useEffect, useState } from 'react';
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  limit,
-  getDocs
-} from 'firebase/firestore';
-import { db } from '../firebase';        // ← make sure path is right
-import './TrendingCourses.css';          // keep your old styles – few extra classes added
+import './TrendingCourses.css';
 import '../modal.css';
 import GlobalEnrollModal from '../modal';
+import api from '../api/axios';  // ⬅ axios instance with baseURL
 
 const TABS = [
-  { key: 'trending',   label: '🔥 Trending'        },
-  { key: 'best',       label: '💎 Best Choice'     },
-  { key: 'premium',    label: '🌟 Premium'         }
+  { key: 'trending', label: '🔥 Trending' },
+  { key: 'best',     label: '💎 Best Choice' },
+  { key: 'premium',  label: '🌟 Premium' }
 ];
 
 const TrendingCourses = () => {
-  const [activeTab,     setActiveTab]     = useState(TABS[0].key);
-  const [courses,       setCourses]       = useState([]);
-  const [loading,       setLoading]       = useState(true);
+  const [activeTab, setActiveTab] = useState(TABS[0].key);
+  const [courses,   setCourses]   = useState([]);
+  const [loading,   setLoading]   = useState(true);
 
-  /* ────────── enroll modal state ────────── */
   const [showModal,     setShowModal]     = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formData,      setFormData]      = useState({
-    firstName:'', middleName:'', lastName:'',
-    phone:'', alternatePhone:'', email:'', address:'',
-    courseName:''
+    firstName: '', middleName: '', lastName: '',
+    phone: '', alternatePhone: '', email: '', address: '',
+    courseName: ''
   });
 
-  /* ────────── fetch on tab change ────────── */
+  /* ─────────── Fetch on Tab Switch ─────────── */
   useEffect(() => {
-    (async () => {
+    const fetchCourses = async () => {
       setLoading(true);
-      let q;
+      try {
+        let params = { limit: 6 };
 
-      if (activeTab === 'trending') {
-        // latest courses
-        q = query(collection(db,'courses'), orderBy('createdAt','desc'), limit(6));
-      } else if (activeTab === 'best') {
-        // highest rated
-        q = query(collection(db,'courses'), orderBy('rating','desc'), limit(6));
-      } else { // premium
-        // tag OR flag
-        q = query(
-          collection(db,'courses'),
-          where('tags', 'array-contains', 'premium'),  // if you store tags array
-          limit(6)
-        );
+        if (activeTab === 'trending') {
+          params.sort = 'created_at';
+        } else if (activeTab === 'best') {
+          params.sort = 'rating';
+        } else if (activeTab === 'premium') {
+          params.tag = 'premium';
+        }
+
+        const { data } = await api.get('/courses', { params });
+        setCourses(data);
+      } catch (err) {
+        console.error("Failed to fetch courses:", err);
+        setCourses([]);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const snap  = await getDocs(q);
-      const list  = snap.docs.map(d=>({id:d.id,...d.data()}));
-      setCourses(list);
-      setLoading(false);
-    })();
+    fetchCourses();
   }, [activeTab]);
 
-  /* ────────── modal helpers ────────── */
-  const handleInputChange = e => setFormData({...formData,[e.target.name]:e.target.value});
+  /* ─────────── Enroll Modal Helpers ─────────── */
+  const handleInputChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
+
   const handleSubmit = e => {
     e.preventDefault();
     setFormSubmitted(true);
-    setTimeout(()=>{
-      setShowModal(false); setFormSubmitted(false);
-      setFormData(p=>({...p,firstName:'',middleName:'',lastName:'',
-        phone:'',alternatePhone:'',email:'',address:''}));
-    },2000);
+    setTimeout(() => {
+      setFormSubmitted(false);
+      setShowModal(false);
+      setFormData(p => ({ ...p, courseName: '' }));
+    }, 2000);
   };
 
-  /* ────────── JSX ────────── */
+  /* ─────────── JSX ─────────── */
   return (
     <section className="trending-section">
       {/* Tabs */}
       <div className="tab-bar">
-        {TABS.map(t=>(
+        {TABS.map(t => (
           <button
             key={t.key}
-            className={`tab-btn ${activeTab===t.key ? 'active' : ''}`}
-            onClick={()=>setActiveTab(t.key)}
+            className={`tab-btn ${activeTab === t.key ? 'active' : ''}`}
+            onClick={() => setActiveTab(t.key)}
           >
             {t.label}
           </button>
@@ -92,20 +86,22 @@ const TrendingCourses = () => {
         <div className="loading-message">Fetching courses…</div>
       ) : (
         <div className="course-grid">
-          {courses.map(course=>(
+          {courses.map(course => (
             <div className="course-card" key={course.id}>
-              <img src={course.thumbnailURL || '/placeholder.jpg'} alt={course.title}/>
+              <img src={course.thumbnail_url || '/placeholder.jpg'} alt={course.title} />
               <div className="course-info">
-                {course.tags?.[0] && (
-                  <span className="course-tag">{course.tags[0]}</span>
+                {course.tag && (
+                  <span className="course-tag">{course.tag}</span>
                 )}
                 <h3>{course.title}</h3>
-                {course.description && <p>{course.description}</p>}
+                {course.description_md && (
+                  <p>{course.description_md.slice(0, 80)}…</p>
+                )}
                 <div className="course-footer">
                   <button
                     className="enroll-btn"
-                    onClick={()=>{
-                      setFormData(p=>({...p,courseName:course.title}));
+                    onClick={() => {
+                      setFormData(p => ({ ...p, courseName: course.title }));
                       setShowModal(true);
                     }}
                   >
@@ -115,14 +111,14 @@ const TrendingCourses = () => {
               </div>
             </div>
           ))}
-          {!courses.length && <p>No courses found in this tab yet. </p>}
+          {!courses.length && <p>No courses found in this tab.</p>}
         </div>
       )}
 
-      {/* enroll modal */}
+      {/* Modal */}
       <GlobalEnrollModal
         show={showModal}
-        onClose={()=>setShowModal(false)}
+        onClose={() => setShowModal(false)}
         onSubmit={handleSubmit}
         onChange={handleInputChange}
         formData={formData}

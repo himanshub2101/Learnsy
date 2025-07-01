@@ -1,0 +1,6 @@
+@import './auth-base.css';
+
+/* signin‑specific tweaks */
+.signin .auth-box {border-top:6px solid #34d399;}         /* green accent     */
+.signin button {background:#34d399;}
+.signin button:hover {background:#29b180;}

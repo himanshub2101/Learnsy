@@ -1,22 +1,27 @@
-from pydantic import BaseModel, Field
-from typing import List, Dict, Optional
+# app/routers/schemas/enrollment.py
 from datetime import datetime
+from typing import Optional, Dict
+from pydantic import BaseModel, Field
 
-class EnrollOut(BaseModel):
-    id: str
+class EnrollmentBase(BaseModel):
     course_id: str
-    progress: List | Dict
+
+class EnrollmentCreate(EnrollmentBase):
+    pass  # nothing extra for now
+
+class EnrollmentProgressUpdate(BaseModel):
+    progress_pct: Optional[float] = Field(None, ge=0, le=100)
+    progress_meta: Optional[Dict]
+
+class EnrollmentOut(EnrollmentBase):
+    id: str
+    user_id: str
+    progress_pct: float
     completed: bool
-    certificate_uri: Optional[str]
+    completed_at: Optional[datetime]
+    nft_token_id: Optional[str]
+    certificate_url: Optional[str]
+    created_at: datetime
 
     class Config:
         from_attributes = True
-
-class ProgressUpdate(BaseModel):
-    # e.g. ["lesson1", "lesson2"] or { "module1": ["l1","l2"] }
-    completed_lessons: List[str] | Dict
-
-class EnrollmentAdminOut(EnrollOut):
-    user_id: str
-    completed_at: Optional[datetime]
-    certificate_tx: Optional[str]

@@ -7,9 +7,14 @@ const Footer = () => {
       <div className="footer-container">
         {/* 1. About Section */}
         <div className="footer-section about">
-          <h4>
-            <img src="/logo.png" alt="Learnsy Logo" className="footer-logo" />
-          </h4>
+<h4>
+  <img
+    src="/logo.png"
+    alt="Learnsy logo"
+    className="footer-logo golden-border" 
+  />
+</h4>
+
           <p>
             Learnsy offers top-notch online courses in web development, programming,
             digital marketing, video editing and more. Empower your career with expert-led content.

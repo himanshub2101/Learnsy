@@ -5,7 +5,7 @@ from sqlalchemy import pool
 from app.models.base import Base
 from alembic import context
 from app.models import course      # NEW import so Alembic detects Course
-
+from app.models import enrollment 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

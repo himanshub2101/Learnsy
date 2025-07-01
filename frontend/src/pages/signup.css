@@ -1,0 +1,6 @@
+@import './auth-base.css';
+
+/* signup‑specific tweaks */
+.signup .auth-box {border-top:6px solid #38bdf8;}         /* nice cyan accent  */
+.signup button {background:#38bdf8;}                      /* cyan button      */
+.signup button:hover {background:#2fa9dc;}

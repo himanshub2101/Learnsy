@@ -18,11 +18,15 @@ async def list_courses(
     limit: int = 10,
     db: AsyncSession = Depends(get_db)
 ):
-    query = select(Course).where(Course.published == True)
-    if search:
-        query = query.where(Course.title.ilike(f"%{search}%"))
-    result = await db.scalars(query.offset(skip).limit(limit))
-    return result.all()
+    try:
+        query = select(Course).where(Course.published == True)
+        if search:
+            query = query.where(Course.title.ilike(f"%{search}%"))
+        result = await db.scalars(query.offset(skip).limit(limit))
+        return result.all()
+    except Exception as e:
+        print("🔥 ERROR in /courses/:", e)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.get("/{course_id}", response_model=CourseOut)
 async def get_course(course_id: str, db: AsyncSession = Depends(get_db)):

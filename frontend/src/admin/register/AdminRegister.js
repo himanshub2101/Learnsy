@@ -1,164 +1,133 @@
+// src/pages/AdminRegister.jsx
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth, db, googleProvider, facebookProvider } from '../../firebase';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import axios from '../../api/axios';          // centralised axios instance
 import { Link, useNavigate } from 'react-router-dom';
 import './AdminRegister.css';
+import Header from '../../components/Header';
+/* ——— helper to normalise FastAPI errors ——— */
+const extractErrors = (err) => {
+  const detail = err?.response?.data?.detail;
+
+  // Pydantic validation → list of {loc, msg, type, …}
+  if (Array.isArray(detail)) return detail.map((d) => d.msg);
+
+  // Our HTTPException detail → string
+  if (typeof detail === 'string') return [detail];
+
+  // Network / Axios message fallback
+  return [err.message || 'Something went wrong'];
+};
 
 const AdminRegister = () => {
   const navigate = useNavigate();
 
+  /* ——— state ——— */
   const [formData, setFormData] = useState({
     firstName: '',
-    lastName: '',
-    phone: '',
-    email: '',
-    password: '',
+    lastName : '',
+    phone    : '',
+    email    : '',
+    password : '',
     confirmPassword: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [errors , setErrors]  = useState([]);   // <- array of strings
 
-  const [error, setError] = useState('');
+  const handleChange = (e) =>
+    setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
+  /* ——— submit ——— */
   const handleRegister = async (e) => {
     e.preventDefault();
-    const { firstName, lastName, phone, email, password, confirmPassword } = formData;
+    setErrors([]);
+
+    const { firstName, lastName, phone,
+            email, password, confirmPassword } = formData;
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setErrors(['Passwords do not match']);
       return;
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      setLoading(true);
 
-      await setDoc(doc(db, 'admins', user.uid), {
-        firstName,
-        lastName,
+      const res = await axios.post('/auth/signup', {
+        first_name: firstName,
+        last_name : lastName,
         phone,
         email,
-        createdAt: new Date().toISOString(),
-        provider: 'email',
+        password,
       });
 
+      localStorage.setItem('adminToken', res.data.access_token);
+      localStorage.setItem('adminEmail', email);
       navigate('/admin');
     } catch (err) {
       console.error(err);
-      setError(err.message || 'Registration failed');
+      setErrors(extractErrors(err));
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSocialRegister = async (provider, providerName) => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      const docRef = doc(db, 'admins', user.uid);
-      const snap = await getDoc(docRef);
-
-      if (!snap.exists()) {
-        await setDoc(docRef, {
-          firstName: user.displayName?.split(' ')[0] || '',
-          lastName: user.displayName?.split(' ')[1] || '',
-          email: user.email,
-          phone: '',
-          createdAt: new Date().toISOString(),
-          provider: providerName,
-        });
-      }
-
-      const token = await user.getIdToken();
-      localStorage.setItem('adminToken', token);
-      localStorage.setItem('adminEmail', user.email);
-      navigate('/admin');
-    } catch (err) {
-      console.error(`${providerName} registration failed:`, err);
-      setError(`${providerName} registration failed`);
-    }
-  };
+  /* ——— JSX ——— */
 
   return (
+<>
+    <Header/>
     <div className="auth-container">
       <form onSubmit={handleRegister} className="auth-form">
         <h2>Admin Registration</h2>
-        {error && <p className="auth-error">{error}</p>}
+
+        {/* error block */}
+        {errors.length > 0 && (
+          <div className="auth-error">
+            {errors.map((msg, i) => (
+              <p key={i}>{msg}</p>
+            ))}
+          </div>
+        )}
 
         <input
-          name="firstName"
-          type="text"
-          placeholder="First Name"
-          required
-          value={formData.firstName}
-          onChange={handleChange}
+          name="firstName" placeholder="First Name" required
+          value={formData.firstName} onChange={handleChange}
         />
         <input
-          name="lastName"
-          type="text"
-          placeholder="Last Name"
-          required
-          value={formData.lastName}
-          onChange={handleChange}
+          name="lastName" placeholder="Last Name" required
+          value={formData.lastName} onChange={handleChange}
         />
         <input
-          name="phone"
-          type="tel"
-          placeholder="Phone"
-          required
-          value={formData.phone}
-          onChange={handleChange}
+          name="phone" type="tel" placeholder="Phone" required
+          value={formData.phone} onChange={handleChange}
         />
         <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          value={formData.email}
-          onChange={handleChange}
+          name="email" type="email" placeholder="Email" required
+          value={formData.email} onChange={handleChange}
         />
         <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          required
-          value={formData.password}
-          onChange={handleChange}
+          name="password" type="password" placeholder="Password" required
+          value={formData.password} onChange={handleChange}
         />
         <input
-          name="confirmPassword"
-          type="password"
-          placeholder="Confirm Password"
-          required
-          value={formData.confirmPassword}
-          onChange={handleChange}
+          name="confirmPassword" type="password"
+          placeholder="Confirm Password" required
+          value={formData.confirmPassword} onChange={handleChange}
         />
 
-        <button type="submit">Register</button>
-
-        <div className="social-login">
-  <p>Or register with:</p>
-  
-  <button type="button" className="google-btn" onClick={() => handleSocialRegister(googleProvider, 'Google')}>
-    <i className="fab fa-google" style={{ marginRight: '8px' }}></i> Continue with Google
-  </button>
-
-  <button type="button" className="facebook-btn" onClick={() => handleSocialRegister(facebookProvider, 'Facebook')}>
-    <i className="fab fa-facebook-f" style={{ marginRight: '8px' }}></i> Continue with Facebook
-  </button>
-</div>
-
+        <button type="submit" disabled={loading}>
+          {loading ? 'Registering…' : 'Register'}
+        </button>
 
         <div className="auth-links">
-          <p>Already have an account? <Link to="/admin-login">Login</Link></p>
+          <p>
+            Already have an account?{' '}
+            <Link to="/admin-login">Login</Link>
+          </p>
         </div>
       </form>
     </div>
+  </>
   );
 };
 

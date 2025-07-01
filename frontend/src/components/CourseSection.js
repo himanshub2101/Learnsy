@@ -1,84 +1,95 @@
-import React, { useEffect, useState } from 'react';
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  limit,
-  onSnapshot
-} from 'firebase/firestore';
-import { db } from '../firebase';            // ← path verify कर लेना
-import './CourseSection.css';
-import GlobalEnrollModal from '../modal';
+// src/components/CourseSection.js
+import React, { useEffect, useState } from "react";
+import "./CourseSection.css";
+import api from "../api/axios";
+import GlobalEnrollModal from "../modal";
 
 const CourseSection = () => {
-  /* ───── taxonomy + courses state ───── */
-  const [categories,    setCategories]    = useState([]);   // [{label,value}]
-  const [subcategories, setSubcategories] = useState([]);   // [{label,parent}]
-  const [courses,       setCourses]       = useState([]);
-  const [activeCategory,setActiveCategory]= useState('');
+  /* ───── state ───── */
+  const [categories, setCategories] = useState([]);        // [{id,name,slug}]
+  const [subcats,     setSubcats]   = useState([]);        // [{id,name}]
+  const [courses,     setCourses]   = useState([]);
+  const [activeCat,   setActiveCat] = useState("");
 
-  /* ───── enroll modal state ───── */
-  const [showModal,      setShowModal]      = useState(false);
-  const [formSubmitted,  setFormSubmitted]  = useState(false);
-  const [formData,       setFormData]       = useState({
-    firstName:'', middleName:'', lastName:'',
-    phone:'', alternatePhone:'', email:'', address:'',
-    courseName:''
+  /* ───── enroll modal ───── */
+  const [showModal,     setShowModal]     = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formData,      setFormData]      = useState({
+    firstName: "", middleName: "", lastName: "",
+    phone: "", alternatePhone: "", email: "", address: "",
+    courseName: "",
   });
 
-  /* ───── fetch categories & subcats once ───── */
+  /* ───── fetch all categories once ───── */
   useEffect(() => {
     (async () => {
-      const catSnap = await getDocs(collection(db,'categories'));
-      const catArr  = catSnap.docs.map(d => d.data());   // {label,value}
-      setCategories(catArr);
-      if (catArr.length) setActiveCategory(catArr[0].value);
-
-      const subSnap = await getDocs(collection(db,'subcategories'));
-      setSubcategories(subSnap.docs.map(d => d.data())); // {label,parent}
+      try {
+        const { data } = await api.get("/categories");
+        setCategories(data);
+        if (data.length) setActiveCat(data[0].id);         // default first
+      } catch (err) {
+        console.error("Cannot load categories", err);
+      }
     })();
   }, []);
 
-  /* ───── live listener for top-6 courses in activeCategory ───── */
+  /* ───── when activeCat changes: fetch subcats & top‑6 courses ───── */
   useEffect(() => {
-    if (!activeCategory) return;
-    const q = query(
-      collection(db,'courses'),
-      where('categories','array-contains',activeCategory),
-      limit(6)                                   // सिर्फ 6 दिखा रहे हैं
-    );
-    const unsub = onSnapshot(q,snap=>{
-      setCourses(snap.docs.map(d=>({id:d.id,...d.data()})));
-    });
-    return unsub;
-  }, [activeCategory]);
+    if (!activeCat) return;
 
-  /* ───── derive subcat filter (optional) ───── */
-  const activeSubcats = subcategories
-    .filter(s => (s.parent || s.category) === activeCategory)
-    .map(s => s.label);
+    // sub‑categories
+    (async () => {
+      try {
+        const { data } = await api.get("/subcategories", {
+          params: { category_id: activeCat },
+        });
+        setSubcats(data);
+      } catch (err) {
+        console.error("Cannot load subcategories", err);
+        setSubcats([]);
+      }
+    })();
 
-  const filteredCourses = activeSubcats.length
-    ? courses.filter(c => {
-        const subArr = Array.isArray(c.subcategories)
-          ? c.subcategories
-          : [c.subcategory || ''];
-        return subArr.some(s => activeSubcats.includes(s));
-      })
+    // courses (limit 6)
+    (async () => {
+      try {
+        const { data } = await api.get("/courses", {
+          params: { category_id: activeCat, limit: 6 },
+        });
+        setCourses(data);
+      } catch (err) {
+        console.error("Cannot load courses", err);
+        setCourses([]);
+      }
+    })();
+  }, [activeCat]);
+
+  /* ───── derive optional subcat filter list ───── */
+  const activeSubcatNames = subcats.map((s) => s.name);
+
+  const finalCourses = activeSubcatNames.length
+    ? courses.filter((c) =>
+        (c.subcategory?.name ? [c.subcategory.name] : []).some((n) =>
+          activeSubcatNames.includes(n)
+        )
+      )
     : courses;
 
-  /* ───── modal submit dummy ───── */
-  const handleSubmit = e => {
+  /* ───── enroll modal helpers ───── */
+  const handleSubmit = (e) => {
     e.preventDefault();
     setFormSubmitted(true);
-    setTimeout(()=>{
-      setShowModal(false); setFormSubmitted(false);
-      setFormData(prev=>({...prev,firstName:'',middleName:'',lastName:'',
-        phone:'',alternatePhone:'',email:'',address:'',courseName:''}));
-    },2000);
+    setTimeout(() => {
+      setFormSubmitted(false);
+      setShowModal(false);
+      setFormData((p) => ({ ...p, courseName: "" }));
+    }, 2000);
   };
 
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  /* ───── loading state ───── */
   if (!categories.length)
     return <div className="loading-message">Loading courses…</div>;
 
@@ -87,60 +98,63 @@ const CourseSection = () => {
     <>
       <section className="section-heading-centered">
         <div className="centered-heading">
-          <h2>Why Upskilling is Key to Retaining Top Talent in 2025</h2>
+          <h2>Why Upskilling is Key to Retaining Top Talent in 2025</h2>
         </div>
       </section>
 
       <section className="course-section">
         {/* category pills */}
         <div className="subcategories">
-          {categories.map(cat=>(
+          {categories.map((cat) => (
             <div
-              key={cat.value}
-              className={`pill ${cat.value===activeCategory?'active':''}`}
-              onClick={()=>setActiveCategory(cat.value)}
+              key={cat.id}
+              className={`pill ${cat.id === activeCat ? "active" : ""}`}
+              onClick={() => setActiveCat(cat.id)}
             >
-              <strong>{cat.label}</strong>
+              <strong>{cat.name}</strong>
             </div>
           ))}
         </div>
 
         {/* course cards */}
         <div className="course-cards">
-          {filteredCourses.map(course=>(
-            <div className="course-card" key={course.id}>
-              <img src={course.thumbnailURL || '/placeholder.jpg'} alt={course.title}/>
-              <div className="card-content">
-                <h4 title={course.title}>{course.title}</h4>
-                {course.instructors && <p title={course.instructors}>{course.instructors}</p>}
+          {finalCourses.length ? (
+            finalCourses.map((c) => (
+              <div className="course-card" key={c.id}>
+                <img src={c.thumbnail_url || "/placeholder.jpg"} alt={c.title} />
+                <div className="card-content">
+                  <h4 title={c.title}>{c.title}</h4>
+                  <p>{(c.description_md || "").slice(0, 80)}…</p>
 
-                <div className="rating-price">
-                  <span>⭐ {course.rating || 4.5} (
-                    {(course.reviews || 100).toLocaleString()})</span>
+                  <div className="rating-price">
+                    <span>💵 ${c.price_usd?.toFixed(2) || "0.00"}</span>
+                  </div>
+
+                  <button
+                    className="enroll-btn"
+                    onClick={() => {
+                      setFormData((p) => ({ ...p, courseName: c.title }));
+                      setShowModal(true);
+                    }}
+                    style={{ marginTop: "10px", width: "100%", padding: "10px" }}
+                  >
+                    Enroll Now
+                  </button>
                 </div>
-
-                {course.tag && (
-                  <span className={`tag ${course.tag.toLowerCase().replace(/\s+/g,'-')}`}>
-                    {course.tag}
-                  </span>
-                )}
-
-                <button
-                  className="enroll-btn"
-                  onClick={()=>{ setFormData(p=>({...p,courseName:course.title})); setShowModal(true); }}
-                  style={{marginTop:'10px',width:'100%',padding:'10px'}}
-                >Enroll Now</button>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p style={{ marginTop: "1rem" }}>No courses found in this category.</p>
+          )}
         </div>
       </section>
 
+      {/* global modal */}
       <GlobalEnrollModal
         show={showModal}
-        onClose={()=>setShowModal(false)}
+        onClose={() => setShowModal(false)}
         onSubmit={handleSubmit}
-        onChange={e=>setFormData({...formData,[e.target.name]:e.target.value})}
+        onChange={handleChange}
         formData={formData}
         formSubmitted={formSubmitted}
       />
