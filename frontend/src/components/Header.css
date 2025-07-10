@@ -3,7 +3,8 @@
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:#6d28d9;           /* deep purple */
+  /* background:#6d28d9;           */
+  background: #1a1a1a; /* Updated to dark gray to match the xAI theme */
   padding:1rem 10%;
   color:#fff;
   position:sticky;

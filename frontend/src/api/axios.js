@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',   // ← FastAPI prefix
-  withCredentials: false,                    // JWT in header, not cookie
+  baseURL: process.env.REACT_APP_API_BASE_URL,
+    withCredentials: false,                    // JWT in header, not cookie
 });
 
 api.interceptors.request.use(cfg => {

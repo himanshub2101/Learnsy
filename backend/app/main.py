@@ -10,7 +10,7 @@ app.include_router(enrollment.router, prefix="/api/v1")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # or ["*"] for public API
+    allow_origins=["http://localhost:3000", "www.learnsy.in", "https://learnsy.in", "http://learnsy.in"],  # or ["*"] for public API
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

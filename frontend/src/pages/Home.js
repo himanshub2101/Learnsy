@@ -13,6 +13,7 @@ import Footer from "../components/Footer";
 
 import api from "../api/axios";               // ✅ central axios instance
 import StatsAndTestimonials from "../components/StatsAndTestimonials";
+import HeroGrokSection from "../components/HeroGrokSection";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -152,7 +153,7 @@ setSlides([
       <Header />
 
       {/* Hero carousel + contact form */}
-      <section className="hero-contact">
+      {/* <section className="hero-contact">
         <div className="hero-left">
           {slides.length ? (
             <Slider {...sliderSettings}>
@@ -202,8 +203,8 @@ setSlides([
             </button>
           </form>
         </div>
-      </section>
-
+      </section> */}
+        <HeroGrokSection />
       {/* other home‑page blocks */}
       <TrendingCourses />
       <div className="explore-btn-container">
