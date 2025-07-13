@@ -39,7 +39,7 @@ const GoalSection = () => {
       <div className="goal-right">
         {goals[activeIndex] && (
           <img
-            src={goals[activeIndex].image || 'https://source.unsplash.com/600x500/?graph,analytics'}
+            src={goals[activeIndex].image || '/desktop-certification-prep-2x.webp'}
             alt={goals[activeIndex].title}
           />
         )}

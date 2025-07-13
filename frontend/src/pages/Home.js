@@ -14,6 +14,8 @@ import Footer from "../components/Footer";
 import api from "../api/axios";               // ✅ central axios instance
 import StatsAndTestimonials from "../components/StatsAndTestimonials";
 import HeroGrokSection from "../components/HeroGrokSection";
+import TrustedBy from "../components/TrustedBy";
+import NewsletterSignup from "../components/NewsletterSignup";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -216,7 +218,10 @@ setSlides([
       <CourseSection />
       <GoalSection />
       <StatsAndTestimonials />
+      <TrustedBy/>
+      <NewsletterSignup />
       <Footer />
+
     </>
   );
 };

@@ -1,0 +1,108 @@
+.trustedby-section {
+  padding: 5.5rem 1rem 4.5rem;
+  background-color: #ffffff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.trustedby-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(107, 70, 193, 0.08), transparent 60%);
+  filter: blur(90px);
+  z-index: 0;
+  animation: pulseGlow 6s ease-in-out infinite;
+}
+
+.trustedby-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.25; }
+}
+
+.trustedby-heading {
+  position: relative;
+  z-index: 2;
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 3rem;
+  background: linear-gradient(90deg, #6B46C1, #8a4af3, #818cf8);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 4s ease-in-out infinite;
+  text-shadow: 0 0 12px rgba(107, 70, 193, 0.3);
+  font-family: "Poppins", sans-serif;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.trustedby-logos {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 3.5rem;
+  padding: 0 2rem;
+}
+
+.logo-fade {
+  height: 90px;
+  max-width: 140px;
+  object-fit: contain;
+  filter: grayscale(100%) brightness(0.85);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: revealLogo 0.9s ease-out forwards;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.logo-fade:hover {
+  filter: grayscale(0%) brightness(1.2) drop-shadow(0 0 15px rgba(107, 70, 193, 0.3));
+  transform: scale(1.1);
+}
+
+@keyframes revealLogo {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .trustedby-section {
+    padding: 3rem 1rem 2.5rem;
+  }
+
+  .trustedby-heading {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .trustedby-logos {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 2rem;
+    padding: 0 1rem;
+  }
+
+  .logo-fade {
+    height: 70px;
+    max-width: 110px;
+  }
+}
